@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Document</title>
+
+    <style>
+        .item {
+            border: 1px solid black;
+            padding: 20px;
+            width: 200px;
+            height: 300px;
+            float: left;
+        }
+        #output{
+            clear:both;
+            border: 1px solid black;
+            padding: 30px;
+        }
+        #checkout{
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id='checkout'>
+        total (<span id='items-counter'></span>) : $<span id='total'></span> <span class='btn btn-primary'>Procced to checkout</span>
+    </div>
+
+    <div class='item'>
+        <h3>iPhone</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='iPhone' data-price='5000' data-id='1' data-size='32GB'>Add to
+                cart</a>
+        </div>
+    </div>
+
+    <div class='item'>
+        <h3>iPad</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='iPad' data-price='3000' data-size='32GB' data-id='2'>Add to
+                cart</a>
+        </div>
+    </div>
+
+    <div class='item'>
+        <h3>Cable</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='cable' data-price='120' data-id='3' data-size='1M'>Add to
+                cart</a>
+        </div>
+    </div>
+
+    <div class='item'>
+        <h3>SD-card 32GB</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='SD-card' data-price='200' data-id='4' data-size='32GB'>Add to
+                cart</a>
+        </div>
+    </div>
+
+    <div class='item'>
+        <h3>SD-card 64GB</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='SD-card' data-price='250' data-id='5' data-size='64GB'>Add to
+                cart</a>
+        </div>
+    </div>
+    <div class='item'>
+        <h3>SD-card 16GB</h3>
+        <img src="https://via.placeholder.com/350x150" class="img-fluid">
+        <div>
+            this is description why is the best product in the world
+            <a href="#" class='product-item' data-name='SD-card' data-price='120' data-id='6' data-size='16GB'>Add to
+                cart</a>
+        </div>
+    </div>
+
+    <div id='output'>
+
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+
+        var shopCart = [];
+        var shopCartSession = 'shopCart'
+        var total = 0;
+
+
+        $(document).ready(function () {
+                updateCartFromSession();
+                updateOutputList();
+
+            $('.product-item').click(function (e) {
+                var itemInfo = $(this.dataset)[0]
+                itemInfo.qty = 1;
+
+                var exist = false;
+                $.each(shopCart, function (index, value) {
+                    if (value.id === itemInfo.id) {
+                        value.qty = parseInt(value.qty) + parseInt(itemInfo.qty);
+                        exist = true;
+                    }
+                })
+
+                if (!exist)
+                    shopCart.push(itemInfo);
+
+                sessionStorage[shopCartSession] = JSON.stringify(shopCart);
+                updateCartFromSession();
+                updateOutputList();
+                e.preventDefault();
+            })
+            
+        })
+
+
+        function updateCartFromSession() {
+            if (sessionStorage[shopCartSession] != null){
+                    shopCart = JSON.parse(sessionStorage[shopCartSession]);
+                    $('#checkout').show();    
+                }
+        }
+
+        function updateOutputList(){
+            
+            var itemsCounter = 0;
+            var listHolder = '';
+            $.each(shopCart,function(index,value){
+              var subTotal = ( value.price * value.qty )
+              itemsCounter += parseInt(value.qty);
+              listHolder += value.name +' '+value.qty+ ' '+ value.price +'$ subTotal :'+subTotal.toFixed(2) +'$'+ '<br>';
+              total += subTotal;
+              console.log(total);
+        });
+            listHolder += 'total : $'+total.toFixed(2);
+            $('#output').html(listHolder);
+            $('#total').html(total.toFixed(2));
+            $('#items-counter').html(itemsCounter);
+
+            console.log(shopCart)
+        }
+
+    </script>
+
+</body>
+
+</html>
